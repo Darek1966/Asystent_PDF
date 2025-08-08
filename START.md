@@ -12,10 +12,6 @@ Tutorial do tego projektu znajdziesz tutaj:
 
 ## Start programu:
 
-otwórz plik: **application.py** -> uruchom plik (strzałka - prawy górny róg)
-
-........... ładuje się ...
-
 PS E:\Asystent PDF\Asystent PDF> **streamlit run application.py**
 
 ---
