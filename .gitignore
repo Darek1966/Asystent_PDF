@@ -175,4 +175,5 @@ cython_debug/
 .env.example
 .zencoder/
 desktop.ini
-
+Recenzja_projektu.md
+Start.md
