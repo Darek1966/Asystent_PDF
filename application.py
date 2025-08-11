@@ -2,17 +2,16 @@ import streamlit as st
 from dotenv import load_dotenv
 import pdfplumber
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 
+from langchain_openai import OpenAIEmbeddings
 
 def get_pdf_text(pdf_documents):
-   
     text = ""
     for pdf in pdf_documents:
         with pdfplumber.open(pdf) as pdf_reader:
@@ -91,8 +90,12 @@ def handle_userinput(user_question):
     if not st.session_state.conversation:
         st.error("Najpierw prześlij dokumenty i kliknij przycisk Przetwórz")
         return
-
-    response = st.session_state.conversation.invoke(user_question)
+    try:
+        with st.spinner("Generowanie odpowiedzi..."):
+            response = st.session_state.conversation.invoke(user_question)
+    except Exception as e:
+        st.error(f"Błąd podczas generowania odpowiedzi: {e}")
+        return
 
     st.session_state.memory.save_context(
         {"question": user_question},
