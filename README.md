@@ -80,4 +80,5 @@ Aplikacja będzie dostępna w przeglądarce pod adresem: http://localhost:8501
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Ten projekt jest licencjonowany na licencji MIT - zobacz plik [LICENSE](LICENSE).
+
 ---
