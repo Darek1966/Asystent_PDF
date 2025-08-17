@@ -1,17 +1,17 @@
+import pdfplumber
 import streamlit as st
 from dotenv import load_dotenv
-import pdfplumber
-from langchain.text_splitter import CharacterTextSplitter
-from langchain_community.vectorstores import FAISS
-from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
-from langchain_core.prompts import PromptTemplate
+from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_text_splitters import CharacterTextSplitter
 
-from langchain_openai import OpenAIEmbeddings
 
 def get_pdf_text(pdf_documents):
+
     text = ""
     for pdf in pdf_documents:
         with pdfplumber.open(pdf) as pdf_reader:
@@ -22,10 +22,7 @@ def get_pdf_text(pdf_documents):
 
 def get_text_chunks(text):
     text_splitter = CharacterTextSplitter(
-        separator="\n",
-        chunk_size=1500,
-        chunk_overlap=100,
-        length_function=len
+        separator="\n", chunk_size=1500, chunk_overlap=100, length_function=len
     )
     chunks = text_splitter.split_text(text)
     return chunks
@@ -40,9 +37,7 @@ def get_vectorstore(text_chunks):
 def get_conversation_chain(vectorstore):
     llm = ChatOpenAI()
     memory = ConversationBufferMemory(
-        memory_key="chat_history",
-        return_messages=True,
-        input_key="question"
+        memory_key="chat_history", return_messages=True, input_key="question"
     )
 
     retriever = vectorstore.as_retriever(search_kwargs={"k": 6})
@@ -75,7 +70,7 @@ def get_conversation_chain(vectorstore):
         {
             "context": retriever,
             "question": RunnablePassthrough(),
-            "chat_history": lambda x: memory.load_memory_variables({})["chat_history"]
+            "chat_history": lambda x: memory.load_memory_variables({})["chat_history"],
         }
         | prompt
         | llm
@@ -97,10 +92,7 @@ def handle_userinput(user_question):
         st.error(f"Błąd podczas generowania odpowiedzi: {e}")
         return
 
-    st.session_state.memory.save_context(
-        {"question": user_question},
-        {"output": response}
-    )
+    st.session_state.memory.save_context({"question": user_question}, {"output": response})
 
     # Dodaj pytanie i odpowiedź do historii czatu
     st.session_state.chat_history.append({"role": "user", "content": user_question})
@@ -133,8 +125,7 @@ def main():
     with st.sidebar:
         st.subheader("Twoje dokumenty")
         pdf_documents = st.file_uploader(
-            "Prześlij swoje dokumenty i kliknij 'Przetwórz'",
-            accept_multiple_files=True
+            "Prześlij swoje dokumenty i kliknij 'Przetwórz'", accept_multiple_files=True
         )
 
         if st.button("Przetwórz"):
@@ -160,6 +151,7 @@ def main():
                 st.session_state.chat_history = []
 
                 st.success(f"Dokument {len(pdf_documents)} przetworzono pomyślnie")
+
 
 if __name__ == "__main__":
     main()
